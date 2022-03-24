@@ -1,0 +1,12 @@
+{% extends  "webdev/layout.html" %}
+{% load static %}
+
+{% block body %}
+    <div>
+        <h2>Welcome{% if user.is_authenticated %}, {{ user.username }}{% else %}!{% endif %}</h2>
+
+        <div>
+            TODO
+        </div>
+    </div>
+{% endblock %}
