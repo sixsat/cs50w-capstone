@@ -8,7 +8,7 @@ from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
 
-from .models import User
+from .models import Resource, User
 
 
 def index(request):
@@ -65,3 +65,24 @@ def register(request):
         return HttpResponseRedirect(reverse("index"))
     else:
         return render(request, "webdev/register.html")
+
+
+def resource(request, content_type):
+
+    # Ensure valid content type
+    if content_type not in ["BOOK", "CODE", "CRS", "DOC", "FAV", "PUB", "QUIZ", "VID"]:
+        return JsonResponse({"error": "Invalid content type"}, status=400)
+
+    if content_type == "FAV":
+        resources = Resource.objects.filter(favorite__contains=request.user)
+    elif content_type == "PUB":
+        resources = Resource.objects.filter(user=request.user)
+    else:
+        resources = Resource.objects.filter(category=content_type)
+
+    resources = resources.order_by("-timestamp")
+    return JsonResponse([resource.serialize() for resource in resources], safe=False)
+
+
+def resource_view(request, resource_id):
+    return render(request, "TODO")

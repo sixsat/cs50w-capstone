@@ -7,6 +7,8 @@ urlpatterns = [
     path("login", views.login_view, name="login"),
     path("logout", views.logout_view, name="logout"),
     path("register", views.register, name="register"),
+    path("resource/<int:resource_id>", views.resource_view, name="resource_view"),
 
-    # TODO: API
+    # API Route
+    path("resource/<str:content_type>", views.resource, name="resource"),
 ]
