@@ -2,11 +2,42 @@
 {% load static %}
 
 {% block body %}
-    <div>
+    <div id="home-view">
         <h2>Welcome{% if user.is_authenticated %}, {{ user.username }}{% else %}!{% endif %}</h2>
 
         <div>
             TODO
         </div>
     </div>
+
+    <div id="learn-view" style="display: none;">
+        <h2 class="mb-4">Learn</h2>
+
+        <nav class="nav nav-pills flex-column flex-sm-row py-2 border-top border-bottom">
+            <a id="tab-book" class="flex-sm-fill text-sm-center nav-link">Book</a>
+            <a id="tab-course" class="flex-sm-fill text-sm-center nav-link">Course</a>
+            <a id="tab-document" class="flex-sm-fill text-sm-center nav-link">Document</a>
+            <a id="tab-video" class="flex-sm-fill text-sm-center nav-link">Video</a>
+        </nav>
+    </div>
+
+    <div id="practice-view" style="display: none;">
+        <h2 class="mb-4">Practice</h2>
+
+        <nav class="nav nav-pills flex-column flex-sm-row py-2 border-top border-bottom">
+            <a id="tab-code" class="flex-sm-fill text-sm-center nav-link">Code</a>
+            <a id="tab-quiz" class="flex-sm-fill text-sm-center nav-link">Quiz</a>
+        </nav>
+    </div>
+
+    {% if user.is_authenticated %}
+        <div id="user-view" style="display: none;">
+            <h2 class="mb-4">{{ user.username }}</h2>
+
+            <nav class="nav nav-pills flex-column flex-sm-row py-2 border-top border-bottom">
+                <a id="tab-favorite" class="flex-sm-fill text-sm-center nav-link">Favorite</a>
+                <a id="tab-published" class="flex-sm-fill text-sm-center nav-link">Published</a>
+            </nav>
+        </div>
+    {% endif %}
 {% endblock %}
