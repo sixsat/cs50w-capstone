@@ -27,8 +27,12 @@ class Language(models.Model):
 
 class Resource(models.Model):
     CATEGORY_CHOICES = [
-        ("LEARN", "Learn"),
-        ("PRACT", "Practice")
+        ("BOOK", "Book"),
+        ("CODE", "Code"),
+        ("CRS", "Course"),
+        ("DOC", "Document"),
+        ("QUIZ", "Quiz"),
+        ("VID", "Video")
     ]
     LEVEL_CHOICES = [
         ("INTR", "Introductory"),
@@ -38,10 +42,20 @@ class Resource(models.Model):
     title = models.CharField(max_length=150)
     description = models.TextField()
     url = models.URLField(max_length=255)
-    category = models.CharField(max_length=5, choices=CATEGORY_CHOICES)
+    category = models.CharField(max_length=4, choices=CATEGORY_CHOICES)
     timestamp = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey("User", on_delete=models.SET_NULL, related_name="added_by", null=True)
     like = models.ManyToManyField("User", related_name="liker", blank=True)
     favorite = models.ManyToManyField("User", related_name="favoriter", blank=True)
     language = models.ManyToManyField("Language", related_name="lang")
     level = models.CharField(max_length=4, choices=LEVEL_CHOICES)
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "title": self.title,
+            "description": self.description,
+            "timestamp": self.timestamp.strftime("%Y %b %d, %I:%M %p"),
+            "language": [lang for lang in self.language.all()],
+            "level": self.level
+        }
