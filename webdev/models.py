@@ -10,6 +10,10 @@ class Comment(models.Model):
     user = models.ForeignKey("User", on_delete=models.CASCADE, related_name="commenter")
     resource = models.ForeignKey("Resource", on_delete=models.CASCADE, related_name="resource")
     comment = models.CharField(max_length=255)
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def ftime(self):
+        return self.timestamp.strftime("%b %d, %Y, %I:%M %p")
 
 
 class Language(models.Model):
@@ -55,7 +59,7 @@ class Resource(models.Model):
             "id": self.id,
             "title": self.title,
             "description": self.description,
-            "timestamp": self.timestamp.strftime("%Y %b %d, %I:%M %p"),
-            "language": [lang for lang in self.language.all()],
+            "timestamp": self.timestamp.strftime("%b %d, %Y, %I:%M %p"),
+            "language": ", ".join([lang.language for lang in self.language.all()]),
             "level": self.level
         }

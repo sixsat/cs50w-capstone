@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='resource',
             name='category',
-            field=models.CharField(choices=[('BOOK', 'Book'), ('CRS', 'Course'), ('DOC', 'Document'), ('VID', 'Video'), ('CODE', 'Code'), ('QUIZ', 'Quiz')], max_length=4),
+            field=models.CharField(choices=[('BOOK', 'Book'), ('CODE', 'Code'), ('CRS', 'Course'), ('DOC', 'Document'), ('QUIZ', 'Quiz'), ('VID', 'Video')], max_length=4),
         ),
     ]

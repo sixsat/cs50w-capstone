@@ -3,6 +3,10 @@ from django.contrib import admin
 from .models import Comment, Language, Resource, User
 
 
+class CommentTimestamp(admin.ModelAdmin):
+    readonly_fields = ("timestamp",)
+
+
 class ResourceTimestamp(admin.ModelAdmin):
     readonly_fields = ("timestamp",)
 
