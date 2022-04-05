@@ -5,3 +5,7 @@
 .nav-link:hover {
     cursor: pointer;
 }
+
+i:hover {
+    cursor: pointer;
+}
