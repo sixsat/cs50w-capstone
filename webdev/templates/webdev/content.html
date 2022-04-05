@@ -1,0 +1,56 @@
+{% extends  "webdev/layout.html" %}
+
+{% block body %}
+    {% if message %}
+        <h2>{{ message }}</h2>
+    {% else %}
+        {% if category.view == "learn" %}
+            <div id="learn-view">
+                <h2 class="mb-4">Learn</h2>
+
+                <nav class="nav nav-pills flex-column flex-sm-row mb-4 py-2 border-top border-bottom">
+                    <a id="tab-book" class="flex-sm-fill text-sm-center nav-link nav-tab {% if category.cap == 'BOOK' %}active{% endif %}" data-content="book">Book</a>
+                    <a id="tab-course" class="flex-sm-fill text-sm-center nav-link nav-tab {% if category.cap == 'CRS' %}active{% endif %}" data-content="crs">Course</a>
+                    <a id="tab-document" class="flex-sm-fill text-sm-center nav-link nav-tab {% if category.cap == 'DOC' %}active{% endif %}" data-content="doc">Document</a>
+                    <a id="tab-video" class="flex-sm-fill text-sm-center nav-link nav-tab {% if category.cap == 'VID' %}active{% endif %}" data-content="vid">Video</a>
+                </nav>
+            </div>
+        {% elif category.view == "practice" %}
+            <div id="practice-view">
+                <h2 class="mb-4">Practice</h2>
+
+                <nav class="nav nav-pills flex-column flex-sm-row mb-4 py-2 border-top border-bottom">
+                    <a id="tab-code" class="flex-sm-fill text-sm-center nav-link nav-tab {% if category.cap == 'CODE' %}active{% endif %}" data-content="code">Code</a>
+                    <a id="tab-quiz" class="flex-sm-fill text-sm-center nav-link nav-tab {% if category.cap == 'QUIZ' %}active{% endif %}" data-content="quiz">Quiz</a>
+                </nav>
+            </div>
+        {% elif category.view == "user" and user.is_authenticated %}
+            <div id="user-view">
+                <h2 class="mb-4">{{ user.username }}</h2>
+
+                <nav class="nav nav-pills flex-column flex-sm-row mb-4 py-2 border-top border-bottom">
+                    <a id="tab-favorite" class="flex-sm-fill text-sm-center nav-link nav-tab {% if category.cap == 'FAV' %}active{% endif %}" data-content="fav">Favorite</a>
+                    <a id="tab-published" class="flex-sm-fill text-sm-center nav-link nav-tab {% if category.cap == 'PUB' %}active{% endif %}" data-content="pub">Published</a>
+                </nav>
+            </div>
+        {% endif %}
+
+        <div id="content">
+            {% for resource in resources %}
+                <div class="card mb-4">
+                    <a class="text-body text-decoration-none" href="{% url 'resource' resource.pk %}">
+                        <div class="card-header">{{ resource.language.all|join:", " }}</div>
+                        <div class="card-body">
+                            <h5 class="card-title">{{ resource.title }}</h5>
+                            <p class="card-text">{{ resource.description }}</p>
+                            {% with lv=level|get_item:resource.level %}
+                                <p class="card-text">Level: <span class="{{ lv.color }}">{{ lv.full }}</span></p>
+                            {% endwith %}
+                        </div>
+                        <div class="card-footer"><small class="text-muted">{{ resource.serialize.timestamp }}</small></div>
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endblock %}
