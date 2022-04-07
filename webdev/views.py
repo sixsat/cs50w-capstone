@@ -206,10 +206,54 @@ def resource(request, resource_id):
         comments = Comment.objects.filter(resource=resource_id).order_by("timestamp")
     except Resource.DoesNotExist:
         return render(request, "webdev/resource.html", {
-            "message": "Resource does not exists."
-        })
+            "message": "Resource not found."
+        }, status=404)
 
-    return render(request, "webdev/resource.html", {
+    context = {
         "resource": resource,
         "comments": comments
-    })
+    }
+
+    if request.user.is_authenticated:
+        context["liked"] = resource.like.filter(pk=request.user.pk).exists()
+        context["faved"] = resource.favorite.filter(pk=request.user.pk).exists()
+
+    return render(request, "webdev/resource.html", context)
+
+
+@login_required
+def update(request, resource_id):
+    """Update resource's like or favorite field"""
+
+    # Update must be via PUT
+    if request.method != "PUT":
+        return JsonResponse({"error": "PUT request required."}, status=400)
+
+    try:
+        resource = Resource.objects.get(pk=resource_id)
+    except Resource.DoesNotExist:
+        return JsonResponse({"error": "Resource not found."}, status=404)
+
+    # Attempt to like/unlike or fave/unfave resource
+    action = json.loads(request.body)["action"]
+    try:
+        if action == "like":
+            icon = "fa-heart"
+            if resource.like.filter(pk=request.user.pk).exists():
+                resource.like.remove(request.user)
+            else:
+                resource.like.add(request.user)
+            count = resource.like.all().count()
+        elif action == "fave":
+            icon = "fa-star"
+            if resource.favorite.filter(pk=request.user.pk).exists():
+                resource.favorite.remove(request.user)
+            else:
+                resource.favorite.add(request.user)
+            count = resource.favorite.all().count()
+        else:
+            return JsonResponse({"error": "Invalid action."}, status=400)
+    except Exception as e:
+        raise e
+
+    return JsonResponse({"icon": icon, "count": count}, status=200)

@@ -1,3 +1,9 @@
+.btn-none {
+    padding: 0;
+    border: none;
+    background: none;
+}
+
 .dropdown-item:hover {
     cursor: pointer;
 }

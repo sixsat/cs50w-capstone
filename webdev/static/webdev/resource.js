@@ -1,7 +1,14 @@
 document.addEventListener('DOMContentLoaded', function() {
-    form = document.querySelector('#comment-form');
-    if (form !== null) {
-        form.onsubmit = () => add_comment(document.querySelector('#resource-id').value);
+    resource_id = document.querySelector('#resource-id').value;
+    form_comment = document.querySelector('#comment-form');
+    form_like = document.querySelector('#like-form');
+    form_fave = document.querySelector('#fave-form');
+
+    // If forms are not null, listen to form submission event
+    if (form_comment && form_like && form_fave) {
+        form_comment.onsubmit = () => add_comment(resource_id);
+        form_like.onsubmit = () => update(resource_id, 'like');
+        form_fave.onsubmit = () => update(resource_id, 'fave');
     }
 });
 
@@ -17,7 +24,7 @@ function add_comment(resource_id) {
     fetch(`/resource/${resource_id}/comment`, {
         method: 'POST',
         headers: {'X-CSRFToken': csrftoken},
-        mode: 'same-origin', // Do not send CSRF token to another domain.
+        mode: 'same-origin', // Do not send CSRF token to another domain
         body: JSON.stringify({
             comment: element_comment.value
         })
@@ -55,5 +62,44 @@ function add_comment(resource_id) {
     });
 
     // Prevent default submission
+    return false;
+}
+
+/**
+ * Update resource's like or favorite field
+ */
+function update(resource_id, action) {
+    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+    fetch(`/resource/${resource_id}/update`, {
+        method: 'PUT',
+        headers: {'X-CSRFToken': csrftoken},
+        mode: 'same-origin',
+        body: JSON.stringify({
+            action: action
+        })
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result['error']) {
+            console.log(result);
+        } else {
+            const element_icon = document.querySelector(`.${result['icon']}`);
+
+            // Toggle between regular and solid icon
+            if (element_icon.classList.contains('far')) {
+                element_icon.classList.replace('far', 'fas');
+            } else {
+                element_icon.classList.replace('fas', 'far');
+            }
+
+            // Update number of like/favorite
+            document.querySelector(`#${result['icon']}-count`).innerHTML = ` ${result['count']} `;
+        }
+    })
+    .catch(error => {
+        console.log(error);
+    });
+
     return false;
 }

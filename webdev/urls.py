@@ -13,4 +13,5 @@ urlpatterns = [
     # API Routes
     path("getcontent/<str:content_type>", views.get_content, name="get_content"),
     path("resource/<int:resource_id>/comment", views.comment, name="comment"),
+    path("resource/<int:resource_id>/update", views.update, name="update"),
 ]

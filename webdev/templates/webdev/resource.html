@@ -14,8 +14,22 @@
             <h2>{{ resource.title }}</h2>
             <p><small><span class="text-muted">Added </span>{{ resource.timestamp }}</small></p>
             <p>
-                <i class="far fa-heart"></i><span> {{ resource.like.all.count }} </span>
-                <i class="far fa-star"></i><span> {{ resource.favorite.all.count }} </span>
+                {% if user.is_authenticated %}
+                    <form id="like-form" class="d-inline" method="put">
+                        {% csrf_token %}
+                        <button class="btn-none" type="submit"><i class="{% if liked %}fas{% else %}far{% endif %} fa-heart"></i></button>
+                    </form>
+                    <span id="fa-heart-count"> {{ resource.like.all.count }} </span>
+
+                    <form id="fave-form" class="d-inline" method="put">
+                        {% csrf_token %}
+                        <button class="btn-none" type="submit"><i class="{% if faved %}fas{% else %}far{% endif %} fa-star"></i></button>
+                    </form>
+                    <span id="fa-star-count"> {{ resource.favorite.all.count }} </span>
+                {% else %}
+                    <i class="far fa-heart"></i><span> {{ resource.like.all.count }} </span>
+                    <i class="far fa-star"></i><span> {{ resource.favorite.all.count }} </span>
+                {% endif %}
             </p>
             <hr>
 
