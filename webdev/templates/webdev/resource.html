@@ -34,7 +34,11 @@
             <hr>
 
             <div class="mb-1">{{ resource.description }}</div>
-            <iframe frameborder="0" width="100%" height="500px" src="{{ resource.url }}"></iframe>
+            {% if resource.embeddable %}
+                <iframe frameborder="0" width="100%" height="500px" src="{{ resource.url }}"></iframe>
+            {% else %}
+                <br><h5>This site can't be embedded, use the URL below.</h5>
+            {% endif %}
             <a href="{{ resource.url }}" target="_blank" rel="noopener noreferrer">{{ resource.url }}</a>
             <p class="d-flex justify-content-end"><small><span class="text-muted">Added by </span>{{ resource.user }}</small></p>
             

@@ -1,3 +1,5 @@
+import requests
+
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
@@ -46,6 +48,7 @@ class Resource(models.Model):
     title = models.CharField(max_length=150)
     description = models.TextField()
     url = models.URLField(max_length=255)
+    embeddable = models.BooleanField()
     category = models.CharField(max_length=4, choices=CATEGORY_CHOICES)
     timestamp = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey("User", on_delete=models.SET_NULL, related_name="added_by", null=True)
@@ -53,6 +56,13 @@ class Resource(models.Model):
     favorite = models.ManyToManyField("User", related_name="favoriter", blank=True)
     language = models.ManyToManyField("Language", related_name="lang")
     level = models.CharField(max_length=4, choices=LEVEL_CHOICES)
+
+    def save(self, *args, **kwargs):
+
+        # Check if URL is embeddable and assign result to "embeddable" field
+        self.embeddable = requests.get(self.url).headers.get("X-Frame-Options") in ["DENY", "SAMEORIGIN"]
+
+        super().save(*args, **kwargs)
 
     def serialize(self):
         return {
