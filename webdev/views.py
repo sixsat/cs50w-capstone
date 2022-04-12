@@ -2,7 +2,6 @@ import json
 
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from django.core.paginator import Paginator
 from django.db import IntegrityError
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
@@ -10,6 +9,7 @@ from django.template.defaulttags import register
 from django.urls import reverse
 
 from .models import Comment, Resource, User
+from .forms import NewResourceForm
 
 CATEGORY = {
     "book": {
@@ -63,33 +63,52 @@ LEVEL = {
 
 
 def index(request):
-    return render(request, "webdev/index.html")
+    return render(request, "webdev/index.html", {
+        "level": LEVEL,
+        "resources": Resource.objects.order_by("-timestamp") # Reverse chronologial order
+    })
 
 
 @login_required
 def comment(request, resource_id):
 
-    # Add a comment must be via POST
+    # Add/Remove a comment must be via POST
     if request.method != "POST":
         return JsonResponse({"error": "POST request required."}, status=400)
 
-    # Attempt to create new comment
-    comment = json.loads(request.body)["comment"]
-    try:
-        comment_obj = Comment(
-            user=request.user,
-            resource=Resource.objects.get(pk=resource_id),
-            comment=comment
-        )
-        comment_obj.save()
-    except Exception as e:
-        raise e
+    data = json.loads(request.body)
+    comment_id = data.get("comment_id")
 
-    return JsonResponse({
-        "message": "Comment added.",
-        "username": request.user.username,
-        "timestamp": Comment.objects.get(pk=comment_obj.pk).ftime()
-    }, status=201)
+    if comment_id is not None:
+
+        # Attempt to delete comment
+        try:
+            comment_obj = Comment.objects.get(pk=comment_id)
+            comment_obj.delete()
+        except Comment.DoesNotExist:
+            return JsonResponse({"error": "Comment not found."}, status=404)
+
+        return JsonResponse({"message": "Comment deleted."}, status=200)
+    else:
+    
+        # Attempt to create new comment
+        comment = data["comment"]
+        try:
+            comment_obj = Comment(
+                user=request.user,
+                resource=Resource.objects.get(pk=resource_id),
+                comment=comment
+            )
+            comment_obj.save()
+        except Exception as e:
+            raise e
+
+        return JsonResponse({
+            "cid": comment_obj.pk,
+            "message": "Comment added.",
+            "username": request.user.username,
+            "timestamp": Comment.objects.get(pk=comment_obj.pk).ftime()
+        }, status=201)
 
 
 def content(request, content_type):
@@ -113,13 +132,51 @@ def content(request, content_type):
     else:
         resources = Resource.objects.filter(category=CATEGORY[content_type]["cap"])
 
-    # Return resources in reverse chronologial order
     resources = resources.order_by("-timestamp")
     return render(request, "webdev/content.html", {
         "level": LEVEL,
         "resources": resources,
         "category": CATEGORY[content_type]
     })
+
+
+@login_required
+def create(request):
+    if request.method == "POST":
+        form = NewResourceForm(request.POST)
+
+        if form.is_valid():
+            title = form.cleaned_data["title"]
+            description = form.cleaned_data["description"]
+            url = form.cleaned_data["url"]
+            category = form.cleaned_data["category"]
+            language = form.cleaned_data["language"]
+            level = form.cleaned_data["level"]
+
+            # Attempt to create new resource
+            try:
+                resource = Resource(
+                    title=title,
+                    description=description,
+                    url=url,
+                    category=category,
+                    user=request.user,
+                    level=level
+                )
+                resource.save()
+                resource.language.set(language)
+            except Exception as e:
+                raise e
+            return HttpResponseRedirect(reverse("content", args=("published",)))
+        else:
+            # Re-render the page with existing information
+            return render(request, "webdev/create.html", {
+                "form": form
+            })
+    else:
+        return render(request, "webdev/create.html", {
+            "form": NewResourceForm()
+        })
 
 
 def get_content(request, content_type):
@@ -209,16 +266,30 @@ def resource(request, resource_id):
             "message": "Resource not found."
         }, status=404)
 
-    context = {
-        "resource": resource,
-        "comments": comments
-    }
+    if request.method == "POST":
 
-    if request.user.is_authenticated:
-        context["liked"] = resource.like.filter(pk=request.user.pk).exists()
-        context["faved"] = resource.favorite.filter(pk=request.user.pk).exists()
+        # Ensure user is logged in and have permission to delete the resource
+        if not request.user.is_authenticated:
+            return render(request, "webdev/resource.html", {
+                "message": "Login required."
+            }, status=401)
+        elif request.user.username != resource.user.username:
+            return render(request, "webdev/resource.html", {
+                "message": "Permission denied."
+            }, status=403)
 
-    return render(request, "webdev/resource.html", context)
+        resource.delete()
+        return HttpResponseRedirect(reverse("index"))
+    else:
+        context = {
+            "resource": resource,
+            "comments": comments
+        }
+        if request.user.is_authenticated:
+            context["liked"] = resource.like.filter(pk=request.user.pk).exists()
+            context["faved"] = resource.favorite.filter(pk=request.user.pk).exists()
+
+        return render(request, "webdev/resource.html", context)
 
 
 @login_required
