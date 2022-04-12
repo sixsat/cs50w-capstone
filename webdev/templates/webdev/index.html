@@ -1,11 +1,24 @@
 {% extends  "webdev/layout.html" %}
 
 {% block body %}
-    <div id="home-view">
-        <h2>Welcome{% if user.is_authenticated %}, {{ user.username }}{% else %}!{% endif %}</h2>
+    <div>
+        <h2>All content</h2>
+        <hr class="mb-4">
 
-        <div>
-            <!-- TODO -->
-        </div>
+        {% for resource in resources %}
+            <div class="card mb-4">
+                <a class="text-body text-decoration-none" href="{% url 'resource' resource.pk %}">
+                    <div class="card-header">{{ resource.language.all|join:", " }}</div>
+                    <div class="card-body">
+                        <h5 class="card-title">{{ resource.title }}</h5>
+                        <p class="card-text">{{ resource.description }}</p>
+                        {% with lv=level|get_item:resource.level %}
+                            <p class="card-text">Level: <span class="{{ lv.color }}">{{ lv.full }}</span></p>
+                        {% endwith %}
+                    </div>
+                    <div class="card-footer"><small class="text-muted">{{ resource.serialize.timestamp }}</small></div>
+                </a>
+            </div>
+        {% endfor %}
     </div>
 {% endblock %}
