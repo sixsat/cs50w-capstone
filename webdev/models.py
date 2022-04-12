@@ -59,8 +59,8 @@ class Resource(models.Model):
 
     def save(self, *args, **kwargs):
 
-        # Check if URL is embeddable and assign result to "embeddable" field
-        self.embeddable = requests.get(self.url).headers.get("X-Frame-Options") in ["DENY", "SAMEORIGIN"]
+        # Check if URL is embeddable and assign result to embeddable field
+        self.embeddable = not requests.get(self.url).headers.get("X-Frame-Options")
 
         super().save(*args, **kwargs)
 
