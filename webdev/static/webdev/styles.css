@@ -1,7 +1,23 @@
+@keyframes hide {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
 .btn-none {
     padding: 0;
     border: none;
     background: none;
+}
+
+.comment {
+    animation-name: hide;
+    animation-duration: 1s;
+    animation-fill-mode: forwards;
+    animation-play-state: paused;
 }
 
 .dropdown-item:hover {

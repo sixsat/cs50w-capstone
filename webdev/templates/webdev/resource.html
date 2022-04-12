@@ -13,7 +13,7 @@
         <div>
             <h2>{{ resource.title }}</h2>
             <p><small><span class="text-muted">Added </span>{{ resource.timestamp }}</small></p>
-            <p>
+            <div>
                 {% if user.is_authenticated %}
                     <form id="like-form" class="d-inline" method="put">
                         {% csrf_token %}
@@ -26,16 +26,45 @@
                         <button class="btn-none" type="submit"><i class="{% if faved %}fas{% else %}far{% endif %} fa-star"></i></button>
                     </form>
                     <span id="fa-star-count"> {{ resource.favorite.all.count }} </span>
+
+                    {% if user.username == resource.user.username %}
+                        <!-- Button trigger modal -->
+                        <button type="button" class="btn btn-danger btn-sm float-end" data-bs-toggle="modal" data-bs-target="#modal">
+                            Delete
+                        </button>
+
+                        <!-- Modal -->
+                        <div class="modal fade" id="modal" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Confirmation</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Do you really want to delete this resource?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+                                        <form action="{% url 'resource' resource.pk %}" method="post">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-danger">Yes</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
                 {% else %}
                     <i class="far fa-heart"></i><span> {{ resource.like.all.count }} </span>
                     <i class="far fa-star"></i><span> {{ resource.favorite.all.count }} </span>
                 {% endif %}
-            </p>
+            </div>
             <hr>
 
             <div class="mb-1">{{ resource.description }}</div>
             {% if resource.embeddable %}
-                <iframe frameborder="0" width="100%" height="500px" src="{{ resource.url }}"></iframe>
+                <iframe frameborder="0" width="100%" height="500px" src="{{ resource.url }}">Loading...</iframe>
             {% else %}
                 <br><h5>This site can't be embedded, use the URL below.</h5>
             {% endif %}
@@ -56,9 +85,15 @@
             {% endif %}
             <div id="comments">
                 {% for comment in comments %}
-                    <div class="card mb-3">
+                    <div class="card mb-3 comment">
                         <div class="card-body">
                             <h5 class="card-title">{{ comment.user.username }}</h5>
+                            {% if user.is_authenticated and user.username == comment.user.username %}
+                                <form class="del-comment-form float-end" data-cid="{{ comment.pk }}" method="post">
+                                    {% csrf_token %}
+                                    <button class="btn-none" type="submit"><i class="fas fa-trash-alt"></i></button>
+                                </form>
+                            {% endif %}
                             <p class="card-text">{{ comment.comment }}</p>
                             <p class="card-text"><small class="text-muted">{{ comment.timestamp }}</small></p>
                         </div>
