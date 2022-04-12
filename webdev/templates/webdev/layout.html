@@ -19,8 +19,8 @@
             <div class="container-fluid">
                 <a class="navbar-brand" href="{% url 'index' %}">💻WebDev</a>
 
-                <div class="collapse navbar-collapse position-relative" id="navbarNavDropdown">
-                    <ul class="navbar-nav">
+                <div class="collapse navbar-collapse" id="navbarNavDropdown">
+                    <ul class="navbar-nav me-auto">
                         {% if user.is_authenticated %}
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown">
@@ -30,6 +30,10 @@
                                     <li><a href="{% url 'content' 'favorite' %}" class="dropdown-item">Favorite</a></li>
                                     <li><a href="{% url 'content' 'published' %}" class="dropdown-item">Published</a></li>
                                 </ul>
+                            </li>
+
+                            <li class="nav-item">
+                                <a href="{% url 'create' %}" class="nav-link">Add Resource</a>
                             </li>
                         {% endif %}
                         <li class="nav-item dropdown">
@@ -55,7 +59,7 @@
                         </li>
                     </ul>
 
-                    <ul class="navbar-nav position-absolute end-0">
+                    <ul class="navbar-nav">
                         {% if user.is_authenticated %}
                             <li class="nav-item">
                                 <a class="nav-link" href="{% url 'logout' %}">Log Out</a>

@@ -1,0 +1,20 @@
+{% extends  "webdev/layout.html" %}
+
+{% block body %}
+    <div>
+        <h2 class="mb-4">New Resource</h2>
+        <form action="{% url 'create' %}" method="post">
+            {% csrf_token %}
+            {% for field in form %}
+                <div class="form-group mb-3">
+                    <div class="mb-1">
+                        {{ field.label }}
+                    </div>
+                    {{ field }}
+                </div>
+            {% endfor %}
+            <button class="btn btn-primary" type="submit">Add</button>
+        </form>
+    </div>
+    <hr>
+{% endblock %}
