@@ -31,3 +31,10 @@
 i:hover {
     cursor: pointer;
 }
+
+pre {
+    font-size: 16px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    text-align: justify;
+}

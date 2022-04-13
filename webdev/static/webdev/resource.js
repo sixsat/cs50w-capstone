@@ -1,11 +1,12 @@
 document.addEventListener('DOMContentLoaded', function() {
-    const resource_id = document.querySelector('#resource-id').value;
     const form_comment = document.querySelector('#comment-form');
     const form_like = document.querySelector('#like-form');
     const form_fave = document.querySelector('#fave-form');
 
     // If forms are not null, listen to form submission event
     if (form_comment && form_like && form_fave) {
+        const resource_id = document.querySelector('#resource-id').value;
+
         form_comment.onsubmit = () => add_comment(resource_id);
         form_like.onsubmit = () => update(resource_id, 'like');
         form_fave.onsubmit = () => update(resource_id, 'fave');
@@ -79,6 +80,7 @@ function add_comment(resource_id) {
 
 function delete_comment(element_form) {
     const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    const resource_id = document.querySelector('#resource-id').value;
     const element_comment = element_form.parentElement.parentElement;
 
     fetch(`/resource/${resource_id}/comment`, {
