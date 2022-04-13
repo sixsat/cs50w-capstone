@@ -14,6 +14,9 @@ class Comment(models.Model):
     comment = models.CharField(max_length=255)
     timestamp = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        return f"{self.timestamp} {self.user} commented \"{self.comment}\" on Resource_obj ({self.resource.pk})"
+
     def ftime(self):
         return self.timestamp.strftime("%b %d, %Y, %I:%M %p")
 
@@ -56,6 +59,9 @@ class Resource(models.Model):
     favorite = models.ManyToManyField("User", related_name="favoriter", blank=True)
     language = models.ManyToManyField("Language", related_name="lang")
     level = models.CharField(max_length=4, choices=LEVEL_CHOICES)
+
+    def __str__(self):
+        return f"{self.timestamp} {self.user} added ({self.pk}) {self.title}"
 
     def save(self, *args, **kwargs):
 
