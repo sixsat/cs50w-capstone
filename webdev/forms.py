@@ -30,7 +30,7 @@ class NewResourceForm(forms.Form):
         max_length=150, widget=forms.TextInput(attrs=attrs), label="Title"
     )
     description = forms.CharField(
-        widget=forms.Textarea(attrs=attrs), label="Description (markdown supported)"
+        widget=forms.Textarea(attrs=attrs), label="Description"
     )
     url = forms.URLField(
         max_length=255, widget=forms.TextInput(attrs=attrs), label="URL"

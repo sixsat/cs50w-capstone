@@ -3,6 +3,7 @@ import json
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
+from django.db.models import Q
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.template.defaulttags import register
@@ -63,9 +64,20 @@ LEVEL = {
 
 
 def index(request):
+    query = request.GET.get('q')
+
+    # Check if user submit a search query
+    if query is not None:
+        resources = Resource.objects.filter(
+            Q(title__contains=query) | Q(description__contains=query) | Q(language__language__contains=query)
+        ).order_by("-timestamp") # Reverse chronologial order
+    else:
+        resources = Resource.objects.order_by("-timestamp")
+
     return render(request, "webdev/index.html", {
         "level": LEVEL,
-        "resources": Resource.objects.order_by("-timestamp") # Reverse chronologial order
+        "resources": resources,
+        "query": bool(query)
     })
 
 
