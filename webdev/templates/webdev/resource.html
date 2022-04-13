@@ -62,7 +62,7 @@
             </div>
             <hr>
 
-            <div class="mb-1">{{ resource.description }}</div>
+            <pre class="mb-1">{{ resource.description }}</pre>
             {% if resource.embeddable %}
                 <iframe frameborder="0" width="100%" height="500px" src="{{ resource.url }}">Loading...</iframe>
             {% else %}

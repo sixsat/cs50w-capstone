@@ -2,23 +2,27 @@
 
 {% block body %}
     <div>
-        <h2>All content</h2>
+        <h2 class="me-auto">{% if query %}Search Results ({{ resources.count }}){% else %}All Content{% endif %}</h2>
         <hr class="mb-4">
 
-        {% for resource in resources %}
-            <div class="card mb-4">
-                <a class="text-body text-decoration-none" href="{% url 'resource' resource.pk %}">
-                    <div class="card-header">{{ resource.language.all|join:", " }}</div>
-                    <div class="card-body">
-                        <h5 class="card-title">{{ resource.title }}</h5>
-                        <p class="card-text">{{ resource.description }}</p>
-                        {% with lv=level|get_item:resource.level %}
-                            <p class="card-text">Level: <span class="{{ lv.color }}">{{ lv.full }}</span></p>
-                        {% endwith %}
-                    </div>
-                    <div class="card-footer"><small class="text-muted">{{ resource.serialize.timestamp }}</small></div>
-                </a>
-            </div>
-        {% endfor %}
+        {% if query and resources.count == 0 %}
+            <h5>No results found.</h5>
+        {% else %}
+            {% for resource in resources %}
+                <div class="card mb-4">
+                    <a class="text-body text-decoration-none" href="{% url 'resource' resource.pk %}">
+                        <div class="card-header">{{ resource.language.all|join:", " }}</div>
+                        <div class="card-body">
+                            <h5 class="card-title">{{ resource.title }}</h5>
+                            <p class="card-text">{{ resource.description }}</p>
+                            {% with lv=level|get_item:resource.level %}
+                                <p class="card-text">Level: <span class="{{ lv.color }}">{{ lv.full }}</span></p>
+                            {% endwith %}
+                        </div>
+                        <div class="card-footer"><small class="text-muted">{{ resource.serialize.timestamp }}</small></div>
+                    </a>
+                </div>
+            {% endfor %}
+        {% endif %}
     </div>
 {% endblock %}
