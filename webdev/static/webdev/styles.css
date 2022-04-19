@@ -28,6 +28,10 @@
     cursor: pointer;
 }
 
+body {
+    width: 100vw;
+}
+
 i:hover {
     cursor: pointer;
 }

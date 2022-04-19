@@ -1,8 +1,8 @@
 document.addEventListener('DOMContentLoaded', function() {
+    const search_input = document.querySelector('#search-input');
 
     // Shortcut key
     onkeydown = event => {
-        const search_input = document.querySelector('#search-input');
 
         // Select or deselect serach input
         if (event.ctrlKey && event.key === '/') {
